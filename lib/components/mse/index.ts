@@ -13,8 +13,8 @@ export interface MediaTrack {
 }
 
 export class MseSink extends Sink {
-  private _videoEl: HTMLVideoElement
-  private _done?: () => void
+  protected _videoEl: HTMLVideoElement
+  protected _done?: () => void
 
   public onSourceOpen?: (mse: MediaSource, tracks: MediaTrack[]) => void
 
@@ -114,7 +114,7 @@ export class MseSink extends Sink {
      */
     const outgoing = new Readable({
       objectMode: true,
-      read: function() {
+      read: function () {
         //
       },
     })
