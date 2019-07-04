@@ -57,7 +57,9 @@ export class MseSink extends Sink {
           // Start a new mediaSource and prepare it with a sourceBuffer.
           // When ready, this component's .onSourceOpen callback will be called
           // with the mediaSource, and a list of valid/ignored media.
-          mse = new MediaSource()
+
+          //@ts-ignore
+          mse = new window.MediaSource()
           el.src = window.URL.createObjectURL(mse)
           const handler = () => {
             mse.removeEventListener('sourceopen', handler)
