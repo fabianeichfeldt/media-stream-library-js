@@ -10,7 +10,7 @@ cache:
 
 "install dependencies":
   stage: install
-  tags: [docker-build]
+  tags: [shell]
   script:
     - npm install
   artifacts:
@@ -19,7 +19,7 @@ cache:
 
 "compile":
   stage: compile
-  tags: [docker-build]
+  tags: [shell]
   script:
     - npm run build
   artifacts:
@@ -28,13 +28,13 @@ cache:
 
 "test":
   stage: quality
-  tags: [docker-build]
+  tags: [shell]
   script:
     - npm test
 
 "coverage":
   stage: quality
-  tags: [docker-build]
+  tags: [shell]
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   script:
     - npm run coverage
@@ -45,13 +45,13 @@ cache:
 
 "lint":
   stage: quality
-  tags: [docker-build]
+  tags: [shell]
   script:
     - npm run lint
 
 "deploy":
   stage: deploy
-  tags: [docker-build]
+  tags: [shell]
   only:
     - master
   script:
