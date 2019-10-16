@@ -14,4 +14,4 @@ export * from './rtsp-parser'
 export * from './rtsp-session'
 export * from './ws-source'
 
-export { MessageType } from './message'
+export { Message, ElementaryMessage, MessageType } from './message'
