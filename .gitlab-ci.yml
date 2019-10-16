@@ -1,0 +1,60 @@
+image: node:latest
+
+stages:
+  - install
+  - compile
+  - quality
+  - deploy
+
+cache:
+  paths:
+    - node_modules/
+
+"install dependencies":
+  stage: install
+  tags: [docker-build]
+  script:
+    - npm install
+  artifacts:
+    paths:
+      - node_modules
+
+"compile":
+  stage: compile
+  tags: [docker-build]
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist
+
+"test":
+  stage: quality
+  tags: [docker-build]
+  script:
+    - npm test
+
+"coverage":
+  stage: quality
+  tags: [docker-build]
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  script:
+    - npm run coverage
+  artifacts:
+    when: always
+    paths:
+      - coverage
+
+"lint":
+  stage: quality
+  tags: [docker-build]
+  script:
+    - npm run lint
+
+"deploy":
+  stage: deploy
+  tags: [docker-build]
+  only:
+    - master
+  script:
+    - npm run publish

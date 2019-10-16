@@ -12,7 +12,8 @@
   },
   "scripts": {
     "lint": "eslint --ext '.ts,.js' lib/",
-    "test": "jest --coverage",
+    "test": "jest",
+    "coverage": "jest --coverage",
     "verify": "yarn lint && yarn test",
     "build": "yarn build:esm && yarn build:cjs && yarn build:es5 && yarn build:bundle",
     "build:esm": "tsc -p tsconfig.json",
