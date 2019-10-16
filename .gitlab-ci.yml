@@ -55,4 +55,4 @@ cache:
   only:
     - master
   script:
-    - npm run publish
+    - npm publish
