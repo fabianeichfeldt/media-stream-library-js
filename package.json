@@ -1,5 +1,5 @@
 {
-  "name": "media-stream-library",
+  "name": "cctv-media-stream-library",
   "version": "0.1.2",
   "description": "Media stream library for Node & the Web.",
   "license": "MIT",
