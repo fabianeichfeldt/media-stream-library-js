@@ -5,54 +5,45 @@ stages:
   - deploy
 
 cache:
-  paths:
-    - node_modules/
+  paths: [node_modules/]
 
 "install dependencies":
   stage: install
   tags: [shell]
-  script:
-    - npm install
+  script: npm install
   artifacts:
-    paths:
-      - node_modules
+    paths: [node_modules]
+    expire_in: 1h
 
 "compile":
   stage: compile
   tags: [shell]
-  script:
-    - npm run build
+  script: npm run build
   artifacts:
-    paths:
-      - dist
+    paths: [dist]
+    expire_in: 1h
 
 "test":
   stage: quality
   tags: [shell]
-  script:
-    - npm test
+  script: npm test
 
 "coverage":
   stage: quality
   tags: [shell]
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
-  script:
-    - npm run coverage
+  script: npm run coverage
   artifacts:
     when: always
-    paths:
-      - coverage
+    paths: [coverage]
 
 "lint":
   stage: quality
   tags: [shell]
-  script:
-    - npm run lint
+  script: npm run lint
 
 "deploy":
   stage: deploy
   tags: [shell]
-  only:
-    - master
-  script:
-    - npm publish
+  only: [master]
+  script: npm publish
