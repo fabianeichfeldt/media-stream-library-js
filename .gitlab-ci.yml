@@ -45,5 +45,5 @@ cache:
 "deploy":
   stage: deploy
   tags: [shell]
-  only: master
+  only: [master]
   script: npm publish
