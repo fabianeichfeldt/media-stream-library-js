@@ -1,5 +1,6 @@
 export * from './pipeline'
 
+export * from './gccp-rtsp-pipeline'
 export * from './rtsp-pipeline'
 export * from './rtsp-mjpeg-pipeline'
 export * from './rtsp-mp4-pipeline'
