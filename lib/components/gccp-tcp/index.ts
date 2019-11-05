@@ -93,7 +93,7 @@ export class TcpComponent extends Source {
       }
       try {
         const encoding = undefined
-        this.socket.write(msg.data, encoding, () => callback())
+        this.socket.write(msg.data, encoding, callback)
       } catch (error) {
         console.warn("message lost during send:", msg)
       }
