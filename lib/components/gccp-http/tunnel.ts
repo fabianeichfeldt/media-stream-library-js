@@ -1,7 +1,7 @@
-import { EventEmitter } from "events"
-import { connect, Socket } from "net"
-import * as tls from "tls"
-import * as uuid from "uuid/v4"
+import { EventEmitter } from 'events'
+import { connect, Socket } from 'net'
+import * as tls from 'tls'
+import * as uuid from 'uuid/v4'
 
 type onDataType = (buffer: any) => void
 type callback = () => void
@@ -13,10 +13,15 @@ export class HttpRtspTunnel extends EventEmitter {
   connectionTimeout: number
   socketPost: tls.TLSSocket | Socket | null = null
   socketGet: tls.TLSSocket | Socket | null = null
-  sessionId: string = ""
-  onData: onDataType = () => { }
+  sessionId = ''
+  onData: onDataType = () => {}
 
-  constructor(ip: string, port: number, path: string, connectionTimeout: number) {
+  constructor(
+    ip: string,
+    port: number,
+    path: string,
+    connectionTimeout: number,
+  ) {
     super()
     this.ip = ip
     this.port = port
@@ -42,16 +47,14 @@ export class HttpRtspTunnel extends EventEmitter {
   // tslint:disable-next-line: newspaper-order
   sendCommand(command: Buffer) {
     const buffer = Buffer.from(command)
-    const encodedCommand = buffer.toString("base64")
-    if (this.socketPost)
-      this.socketPost.write(encodedCommand)
+    const encodedCommand = buffer.toString('base64')
+    if (this.socketPost) this.socketPost.write(encodedCommand)
     return new Promise((resolve, reject) => {
       if (this.socketGet)
-        this.socketGet.once("data", (data) => {
+        this.socketGet.once('data', data => {
           resolve()
         })
-      else
-        reject()
+      else reject()
     })
   }
 
@@ -59,7 +62,7 @@ export class HttpRtspTunnel extends EventEmitter {
    * Closes and destroys the httpConnections to the camera properly
    */
   end(cb: callback) {
-    console.debug("destroy httpRtpsTunnel")
+    console.debug('destroy httpRtpsTunnel')
     const postPromise = new Promise((resolve, reject) => {
       if (this.socketPost != null) {
         this.socketPost.end(resolve)
@@ -82,7 +85,7 @@ export class HttpRtspTunnel extends EventEmitter {
   private initGet() {
     return new Promise((resolve, reject) => {
       this.socketGet = this.connect()
-      this.socketGet.once("error", (e) => {
+      this.socketGet.once('error', e => {
         this.socketGet!.destroy()
         reject(e)
       })
@@ -91,24 +94,27 @@ export class HttpRtspTunnel extends EventEmitter {
       // because the POST channel is just used for commands to the cam, which don't need to send regularly
       this.socketGet.setTimeout(this.connectionTimeout, () => {
         console.warn(`timeout @${this.ip}:${this.port}`)
-        this.emit("timeout")
+        this.emit('timeout')
       })
-      this.socketGet.once("connect", () => {
-        console.info(`HttpRtspTunnel ${this.ip}:${this.port} GET connection established`)
-        this.socketGet!.once("data", (data) => {
+      this.socketGet.once('connect', () => {
+        console.info(
+          `HttpRtspTunnel ${this.ip}:${this.port} GET connection established`,
+        )
+        this.socketGet!.once('data', data => {
           this.onData = (fn: onDataType) => {
-            this.socketGet!.on("data", fn)
+            this.socketGet!.on('data', fn)
           }
           resolve()
         })
         const command =
           `GET ${this.path} HTTP/1.0\r\n` +
-          "CSeq: 1\r\n" + "User-Agent: GCCP\r\n" +
-          "Accept: application/x-rtsp-tunnelled\r\n" +
+          'CSeq: 1\r\n' +
+          'User-Agent: GCCP\r\n' +
+          'Accept: application/x-rtsp-tunnelled\r\n' +
           `x-sessioncookie: ${this.sessionId}\r\n` +
-          "Connection: keep-alive\r\n" +
-          "Pragma: no-cache\r\n" +
-          "Cache-Control: no-cache\r\n\r\n"
+          'Connection: keep-alive\r\n' +
+          'Pragma: no-cache\r\n' +
+          'Cache-Control: no-cache\r\n\r\n'
         this.socketGet!.write(command)
       })
     })
@@ -117,21 +123,22 @@ export class HttpRtspTunnel extends EventEmitter {
   private initPost() {
     return new Promise((resolve, reject) => {
       this.socketPost = this.connect()
-      this.socketPost.once("error", (e) => {
+      this.socketPost.once('error', e => {
         this.socketPost!.destroy()
         reject(e)
       })
-      this.socketPost.once("connect", () => {
-        console.info("POST connection established ")
+      this.socketPost.once('connect', () => {
+        console.info('POST connection established ')
         const command =
           `POST ${this.path} HTTP/1.0\r\n` +
-          "CSeq: 1\r\n" + "User-Agent: GCCP\r\n" +
+          'CSeq: 1\r\n' +
+          'User-Agent: GCCP\r\n' +
           `x-sessioncookie: ${this.sessionId}\r\n` +
-          "Content-Type: application/x-rtsp-tunnelled\r\n" +
-          "Pragma: no-cache\r\n" +
-          "Cache-Control: no-cache\r\n" +
-          "Content-Length: 32767\r\n" +
-          "Expires: Sun, 9 Jan 1972 00:00:00 GMT\r\n\r\n"
+          'Content-Type: application/x-rtsp-tunnelled\r\n' +
+          'Pragma: no-cache\r\n' +
+          'Cache-Control: no-cache\r\n' +
+          'Content-Length: 32767\r\n' +
+          'Expires: Sun, 9 Jan 1972 00:00:00 GMT\r\n\r\n'
 
         this.socketPost!.write(command, resolve)
       })
@@ -142,14 +149,16 @@ export class HttpRtspTunnel extends EventEmitter {
     const defaultHttpsPort = 443
 
     let socket: tls.TLSSocket | Socket
-    if (this.port === defaultHttpsPort)
-      socket = tls.connect(this.port, this.ip)
+    if (this.port === defaultHttpsPort) socket = tls.connect(this.port, this.ip)
     else
-      socket = connect(this.port, this.ip)
+      socket = connect(
+        this.port,
+        this.ip,
+      )
 
-    socket.once("close", () => {
+    socket.once('close', () => {
       socket.destroy()
-      this.emit("disconnect")
+      this.emit('disconnect')
     })
     return socket
   }

@@ -1,15 +1,15 @@
-import * as _ from "lodash"
+import * as _ from 'lodash'
 
-import { RtspPipeline } from "./rtsp-pipeline"
-import { Auth, AuthConfig } from "../components/auth"
-import { HttpComponent } from "../components/gccp-http"
-import { TcpComponent } from "../components/gccp-tcp"
+import { RtspPipeline } from './rtsp-pipeline'
+import { Auth, AuthConfig } from '../components/auth'
+import { HttpComponent } from '../components/gccp-http'
+import { TcpComponent } from '../components/gccp-tcp'
 
 export class GccpRtspPipelineConfig {
   auth?: AuthConfig
-  rtsp: { uri: string } = { uri: "" }
-  reconnectInterval: number = 3000
-  connectionTimeout: number = 10000
+  rtsp: { uri: string } = { uri: '' }
+  reconnectInterval = 3000
+  connectionTimeout = 10000
 }
 
 type callback = () => void
@@ -27,7 +27,11 @@ export class GccpRtspPipeline extends RtspPipeline {
     const cloneConfig = _.cloneDeep(config)
     const originalUri = _.cloneDeep(config.rtsp.uri)
     // replace http or https with rtsp
-    cloneConfig.rtsp.uri = _.replace(cloneConfig.rtsp.uri, /https?:\/\//, "rtsp://")
+    cloneConfig.rtsp.uri = _.replace(
+      cloneConfig.rtsp.uri,
+      /https?:\/\//,
+      'rtsp://',
+    )
 
     super(cloneConfig.rtsp)
 
@@ -50,30 +54,31 @@ export class GccpRtspPipeline extends RtspPipeline {
     let tcpSource: HttpComponent | TcpComponent
     // if rtsp is tunneled over http, use http component,
     // but rtsp component still gets a rtsp uri
-    if (uri.startsWith("http"))
+    if (uri.startsWith('http'))
       tcpSource = new HttpComponent(this._connectionTimeout)
-    else if (uri.startsWith("rtsp"))
+    else if (uri.startsWith('rtsp'))
       tcpSource = new TcpComponent(this._connectionTimeout)
-    else throw new Error(`Couldn't create a pipeline for stream ${uri}, no implementation for this protocol.`)
+    else
+      throw new Error(
+        `Couldn't create a pipeline for stream ${uri}, no implementation for this protocol.`,
+      )
 
     if (!_.isNil(tcpSource.events)) {
-      tcpSource.events.on("error", () => this.handleConnectionError(uri))
-      tcpSource.events.on("disconnect", () => this.handleConnectionError(uri))
-      tcpSource.events.on("timeout", () => this.handleConnectionError(uri))
+      tcpSource.events.on('error', () => this.handleConnectionError(uri))
+      tcpSource.events.on('disconnect', () => this.handleConnectionError(uri))
+      tcpSource.events.on('timeout', () => this.handleConnectionError(uri))
     }
     return tcpSource
   }
 
   end(cb: callback) {
-    console.trace(`shutdown RtspWsServer pipline ${this.rtsp.uri}`)
+    console.debug(`shutdown RtspWsServer pipline ${this.rtsp.uri}`)
     this._stopped = true
     this.rtsp.stop()
 
     const closeTcp = new Promise((resolve, reject) => {
-      if (this._tcpSource)
-        this._tcpSource.end(resolve)
-      else
-        resolve()
+      if (this._tcpSource) this._tcpSource.end(resolve)
+      else resolve()
     })
 
     Promise.all([closeTcp]).then(cb)
@@ -81,11 +86,13 @@ export class GccpRtspPipeline extends RtspPipeline {
 
   protected handleConnectionError(uri: string): void {
     if (this._stopped) {
-      this._tcpSource.end(() => { return })
+      this._tcpSource.end(() => {
+        return
+      })
       return
     }
 
-    console.error("lost connection to camera... try to reconnect...")
+    console.error('lost connection to camera... try to reconnect...')
     setTimeout(() => {
       this._tcpSource.end(() => {
         this.remove(this._tcpSource)
