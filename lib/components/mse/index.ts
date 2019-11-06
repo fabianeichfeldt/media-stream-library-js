@@ -58,7 +58,6 @@ export class MseSink extends Sink {
           // When ready, this component's .onSourceOpen callback will be called
           // with the mediaSource, and a list of valid/ignored media.
 
-          //@ts-ignore
           mse = new window.MediaSource()
           el.src = window.URL.createObjectURL(mse)
           const handler = () => {
@@ -116,7 +115,7 @@ export class MseSink extends Sink {
      */
     const outgoing = new Readable({
       objectMode: true,
-      read: function () {
+      read: function() {
         //
       },
     })
