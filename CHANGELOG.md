@@ -1,3 +1,63 @@
+# [7.0.0](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.1.4...v7.0.0) (2020-02-06)
+
+
+### Bug Fixes
+
+* comment instead of empty arrow function ([8f95b4c](https://github.com/AxisCommunications/media-stream-library-js/commit/8f95b4cc923abc78952093c4d9d552a3f27487f8))
+* pass proper type to connect function ([f72fd3d](https://github.com/AxisCommunications/media-stream-library-js/commit/f72fd3d08639a5f84dacf547f82d50a6345d6f79))
+* reformat using prettier ([d90c53b](https://github.com/AxisCommunications/media-stream-library-js/commit/d90c53ba965a65569268761494192e4dee2a559e))
+* use union Message type for MessageHandler ([bda70ef](https://github.com/AxisCommunications/media-stream-library-js/commit/bda70ef700d9d161aa9e047726c0cc17080dcbea))
+
+
+
+## [6.1.4](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.1.3...v6.1.4) (2020-01-26)
+
+
+
+## [6.1.3](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.1.2...v6.1.3) (2020-01-26)
+
+
+
+## [6.1.2](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.1.1...v6.1.2) (2020-01-26)
+
+
+
+## [6.1.1](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.1.0...v6.1.1) (2020-01-26)
+
+
+
+# [6.1.0](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.0.5...v6.1.0) (2020-01-13)
+
+
+### Bug Fixes
+
+* correct wrong SDP types ([0dbc78d](https://github.com/AxisCommunications/media-stream-library-js/commit/0dbc78d6375980d45e41cc34118a884ea788af0c))
+
+
+### Features
+
+* convenience pipeline to extract SDP ([bef7dd2](https://github.com/AxisCommunications/media-stream-library-js/commit/bef7dd2941d7008577b70c91431cb9231307033a))
+
+
+
+## [6.0.5](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.0.4...v6.0.5) (2019-12-19)
+
+
+### Bug Fixes
+
+* only clear buffer before last I-frame ([c2587c9](https://github.com/AxisCommunications/media-stream-library-js/commit/c2587c9959a8dbf8c8068106c60200ceca0b15ec))
+
+
+
+## [6.0.4](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.0.3...v6.0.4) (2019-11-22)
+
+
+### Bug Fixes
+
+* use proper types for the canvas context ([3883540](https://github.com/AxisCommunications/media-stream-library-js/commit/3883540a1da29cf31a51496dea1ed2f882c29840))
+
+
+
 ## [6.0.3](https://github.com/AxisCommunications/media-stream-library-js/compare/v6.0.2...v6.0.3) (2019-08-07)
 
 

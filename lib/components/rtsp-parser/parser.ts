@@ -97,7 +97,6 @@ export class Parser {
 
     const buffer = Buffer.concat(this._chunks)
     const chunkBodyOffset = bodyOffset(buffer)
-
     // If last added chunk does not have the end of the header, return.
     if (chunkBodyOffset === -1) {
       return messages

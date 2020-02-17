@@ -13,8 +13,9 @@ export interface MediaTrack {
 }
 
 export class MseSink extends Sink {
-  protected _videoEl: HTMLVideoElement
-  protected _done?: () => void
+  private _videoEl: HTMLVideoElement
+  private _done?: () => void
+  private _lastCheckpointTime: number
 
   public onSourceOpen?: (mse: MediaSource, tracks: MediaTrack[]) => void
 
@@ -42,6 +43,7 @@ export class MseSink extends Sink {
       write: (msg: Message, encoding, callback) => {
         if (msg.type === MessageType.SDP) {
           // Start a new movie (new SDP info available)
+          this._lastCheckpointTime = 0
 
           // Set up a list of tracks that contain info about
           // the type of media, encoding, and codec are present.
@@ -76,6 +78,10 @@ export class MseSink extends Sink {
           }
           mse.addEventListener('sourceopen', handler)
         } else if (msg.type === MessageType.ISOM) {
+          this._lastCheckpointTime =
+            msg.checkpointTime !== undefined
+              ? msg.checkpointTime
+              : this._lastCheckpointTime
           // ISO BMFF Byte Stream data to be added to the source buffer
           this._done = callback
           try {
@@ -115,7 +121,7 @@ export class MseSink extends Sink {
      */
     const outgoing = new Readable({
       objectMode: true,
-      read: function() {
+      read: function () {
         //
       },
     })
@@ -131,6 +137,7 @@ export class MseSink extends Sink {
     super(incoming, outgoing)
 
     this._videoEl = el
+    this._lastCheckpointTime = 0
   }
 
   /**
@@ -151,7 +158,7 @@ export class MseSink extends Sink {
 
         const index = sourceBuffer.buffered.length - 1
         const start = sourceBuffer.buffered.start(index)
-        const end = el.currentTime - 10
+        const end = Math.min(el.currentTime, this._lastCheckpointTime) - 10
         try {
           // remove all material up to 10 seconds before current time
           if (end > start) {
