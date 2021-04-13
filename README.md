@@ -13,6 +13,37 @@ stream transforms for Node & the Web.
 The primary purpose is to deal with RTP streams in a browser without
 the need to use plugins or Flash, but relying on the [Media Source Extensions](https://www.w3.org/TR/media-source/) standard, which is supported in all modern browsers.
 
+## Investigate browser memory consumption
+This is a special branch for investigating and provoking memory leaks, like described here:
+https://bugs.chromium.org/p/chromium/issues/detail?id=1174675&q=&can=5
+
+### Installation and build
+- install yarn as global tool:
+```
+npm i -g yarn
+```  
+- install dependencies  
+```
+yarn install
+```  
+- build repository  
+```
+yarn build
+```  
+
+### Run backend with rtsp video sources  
+```
+yarn rtsp
+```
+
+### Run http server to host frontend code
+```
+yarn examples
+```
+visit http://localhost:8080/test/h264.html and observe memory consumption over time  
+
+  
+# Original Readme
 ## Structure
 
 The library contains a collection of components that can be connected
