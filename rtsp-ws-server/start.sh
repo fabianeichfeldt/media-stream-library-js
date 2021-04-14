@@ -27,15 +27,16 @@ mjpeg_port="8555"
 if [ -z "$1" ]; then
   echo "serving H.264 video on rtsp://0.0.0.0:${h264_port}/test"
   h264_container1=$(docker run -d --rm -p ${h264_port}:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container2=$(docker run -d --rm -p 8555:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container3=$(docker run -d --rm -p 8556:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container4=$(docker run -d --rm -p 8557:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container5=$(docker run -d --rm -p 8558:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container6=$(docker run -d --rm -p 8559:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container7=$(docker run -d --rm -p 8560:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container8=$(docker run -d --rm -p 8561:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  h264_container9=$(docker run -d --rm -p 8562:8554 steabert/gst-rtsp-launch "$h264_pipeline")
-  container="${h264_container1} ${h264_container2} ${h264_container3} ${h264_container4} ${h264_container5} ${h264_container6} ${h264_container7} ${h264_container8} ${h264_container9}"
+#  h264_container2=$(docker run -d --rm -p 8555:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container3=$(docker run -d --rm -p 8556:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container4=$(docker run -d --rm -p 8557:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container5=$(docker run -d --rm -p 8558:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container6=$(docker run -d --rm -p 8559:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container7=$(docker run -d --rm -p 8560:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container8=$(docker run -d --rm -p 8561:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  h264_container9=$(docker run -d --rm -p 8562:8554 steabert/gst-rtsp-launch "$h264_pipeline")
+#  container="${h264_container1} ${h264_container2} ${h264_container3} ${h264_container4} ${h264_container5} ${h264_container6} ${h264_container7} ${h264_container8} ${h264_container9}"
+   container="${h264_container1}"
 elif [ "$1" = "docker" ]; then
   echo "using default pipeline configured inside the docker container (port 8554)"
   container=$(docker run -d --rm -p 8554:8554 steabert/gst-rtsp-launch)
@@ -54,15 +55,7 @@ trap "docker kill ${container} >& /dev/null" EXIT
 #
 # launch the WebSocket proxy server
 #
-node $(dirname $0)/tcp-ws-proxy.js --port 8854 >& tcp-ws-proxy1.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8855 >& tcp-ws-proxy2.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8856 >& tcp-ws-proxy3.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8857 >& tcp-ws-proxy4.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8858 >& tcp-ws-proxy5.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8859 >& tcp-ws-proxy6.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8860 >& tcp-ws-proxy7.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8861 >& tcp-ws-proxy8.log &
-node $(dirname $0)/tcp-ws-proxy.js --port 8862 >& tcp-ws-proxy9.log &
+node $(dirname $0)/tcp-ws-proxy.js --port 8854 >& tcp-ws-proxy.log &
 
 #
 # print some usage information
