@@ -1,34 +1,62 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Example H.264 video streaming</title>
-  </head>
+<head>
+  <title>Example H.264 video streaming</title>
+</head>
 
-  <body>
-    <div>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-      <video autoplay muted controls></video>
-    </div>
-    <script src="../media-stream-library.min.js"></script>
-    <script src="h264-player.js"></script>
-    <style>
-      div {
-          display: grid;
-          grid-template-rows: 1fr 1fr 1fr;
-          grid-template-columns: 1fr 1fr 1fr;
-      }
-      body {
-          height: 100%;
-          max-height: 100%;
-          overflow: hidden;
-      }
-    </style>
-  </body>
+<body>
+<div class='grid'>
+  <div class='container'>
+    <video class='player' autoplay muted controls></video>
+  </div>
+
+  <div class='container'>
+    <video class='player' autoplay muted controls></video>
+  </div>
+
+  <div class='container'>
+    <video class='player' autoplay muted controls></video>
+  </div>
+  <div class='container'>
+    <video class='player' autoplay muted controls></video>
+  </div>
+  <!--      <video class="player" autoplay muted controls></video>-->
+  <!--      <video class="player" autoplay muted controls></video>-->
+  <!--      <video class="player" autoplay muted controls></video>-->
+  <!--      <video class="player" autoplay muted controls></video>-->
+  <!--      <video autoplay muted controls></video>-->
+  <!--      <video autoplay muted controls></video>-->
+  <!--      <video autoplay muted controls></video>-->
+  <!--      <video autoplay muted controls></video>-->
+</div>
+<script src='../media-stream-library.min.js'></script>
+<script src='h264-player.js'></script>
+<style>
+    .grid {
+        height: 100%;
+        display: grid;
+        grid-template-rows: 50% 50%;
+        grid-template-columns: 50% 50%;
+    }
+
+    .container {
+        border: 2px grey solid;
+        height: 100%;
+        width: 100%;
+    }
+
+    .player {
+        height: 100%;
+        width: 100%;
+        min-width: 0;
+        min-height: 0;
+        object-fit: cover;
+    }
+
+    body, html {
+        height: 100%;
+        overflow: hidden;
+    }
+</style>
+</body>
 </html>
