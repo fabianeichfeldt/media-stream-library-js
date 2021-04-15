@@ -17,15 +17,9 @@ export class TcpSource extends Source {
      */
     const incoming = new Readable({
       objectMode: true,
-      read: function() {
+      read: function () {
         //
       },
-    })
-
-    // When an error is sent on the incoming stream, close the socket.
-    incoming.on('error', e => {
-      console.log('closing TCP socket due to incoming error', e)
-      socket.end()
     })
 
     /**
@@ -34,7 +28,7 @@ export class TcpSource extends Source {
      */
     const outgoing = new Writable({
       objectMode: true,
-      write: function(msg, encoding, callback) {
+      write: function (msg, encoding, callback) {
         const b = msg.data
 
         if (!socket) {
@@ -51,20 +45,15 @@ export class TcpSource extends Source {
           const { hostname, port } = parse(url)
           socket = connect(
             Number(port) || 554,
-            hostname,
+            hostname === null ? undefined : hostname,
           )
-          socket.on('error', e => {
+          socket.on('error', (e) => {
             console.error('TCP socket error:', e)
             socket.destroy()
             incoming.push(null)
           })
-          socket.setTimeout(2000, () => {
-            console.error(`Timeout when connecting to ${hostname}:${port}`)
-            socket.destroy()
-            incoming.push(null)
-          })
 
-          socket.on('data', buffer => {
+          socket.on('data', (buffer) => {
             if (!incoming.push({ data: buffer, type: MessageType.RAW })) {
               console.warn(
                 'TCP Component internal error: not allowed to push more data',
@@ -73,8 +62,8 @@ export class TcpSource extends Source {
           })
           // When closing a socket, indicate there is no more data to be sent,
           // but leave the outgoing stream open to check if more requests are coming.
-          socket.on('finish', e => {
-            console.warn('socket finished', e)
+          socket.on('end', () => {
+            console.warn('socket ended')
             incoming.push(null)
           })
         }
@@ -86,8 +75,19 @@ export class TcpSource extends Source {
       },
     })
 
+    // When an error is sent on the incoming stream, close the socket.
+    incoming.on('error', (e) => {
+      console.log('closing TCP socket due to incoming error', e)
+      socket && socket.end()
+    })
+
+    // When there is no more data going to be sent, close!
+    incoming.on('finish', () => {
+      socket && socket.end()
+    })
+
     // When an error happens on the outgoing stream, just warn.
-    outgoing.on('error', e => {
+    outgoing.on('error', (e) => {
       console.warn('error during TCP send, ignoring:', e)
     })
 

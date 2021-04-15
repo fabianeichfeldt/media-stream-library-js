@@ -39,14 +39,16 @@ export class DigestAuth {
       } else if (algorithm === 'md5-sess') {
         this.algorithm = 'md5-sess'
       }
+    } else {
+      this.algorithm = 'md5'
     }
 
     const qop = params.get('qop')
     if (qop !== undefined) {
-      const possibleQops = qop.split(',').map(qopType => qopType.trim())
-      if (possibleQops.some(qopValue => qopValue === 'auth')) {
+      const possibleQops = qop.split(',').map((qopType) => qopType.trim())
+      if (possibleQops.some((qopValue) => qopValue === 'auth')) {
         this.qop = 'auth'
-      } else if (possibleQops.some(qopValue => qopValue === 'auth-int')) {
+      } else if (possibleQops.some((qopValue) => qopValue === 'auth-int')) {
         this.qop = 'auth-int'
       }
     }
@@ -64,7 +66,7 @@ export class DigestAuth {
     return new Array(4)
       .fill(0)
       .map(() => Math.floor(Math.random() * 256))
-      .map(n => n.toString(16))
+      .map((n) => n.toString(16))
       .join('')
   }
 
@@ -76,7 +78,7 @@ export class DigestAuth {
     return ha1
   }
 
-  ha2 = (method: string, uri: string, body: string = ''): string => {
+  ha2 = (method: string, uri: string, body = ''): string => {
     let ha2 = new MD5().update(`${method}:${uri}`).digest('hex')
     if (this.algorithm === 'md5-sess') {
       const hbody = new MD5().update(body).digest('hex')
@@ -85,11 +87,7 @@ export class DigestAuth {
     return ha2
   }
 
-  authorization = (
-    method: string = 'GET',
-    uri: string = '',
-    body?: string,
-  ): string => {
+  authorization = (method = 'GET', uri = '', body?: string): string => {
     // Increase count
     const nc = this.nc()
     const cnonce = this.cnonce()
@@ -104,7 +102,7 @@ export class DigestAuth {
             .update(`${ha1}:${this.nonce}:${nc}:${cnonce}:${this.qop}:${ha2}`)
             .digest('hex')
 
-    const authorizationParams = []
+    const authorizationParams: string[] = []
     authorizationParams.push(`username="${this.username}"`)
     authorizationParams.push(`realm="${this.realm}"`)
     authorizationParams.push(`nonce="${this.nonce}"`)

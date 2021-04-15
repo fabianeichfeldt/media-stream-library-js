@@ -4,6 +4,7 @@ import { Box } from './helpers/isom'
 import { BoxBuilder } from './helpers/boxbuilder'
 import { Transform } from 'stream'
 import { Tube } from '../component'
+import { NAL_TYPES } from '../h264depay/parser'
 
 /**
  * Component that converts elementary stream data into MP4 boxes honouring
@@ -23,7 +24,7 @@ export class Mp4Muxer extends Tube {
     }
     const incoming = new Transform({
       objectMode: true,
-      transform: function(msg: Message, encoding, callback) {
+      transform: function (msg: Message, encoding, callback) {
         if (msg.type === MessageType.SDP) {
           /**
            * Arrival of SDP signals the beginning of a new movie.
@@ -42,9 +43,22 @@ export class Mp4Muxer extends Tube {
           debug('msl:mp4:isom')(`ftyp: ${ftyp.format()}`)
           debug('msl:mp4:isom')(`moov: ${moov.format()}`)
 
-          this.push(msg) // Pass on the original SDP message
-          this.push({ type: MessageType.ISOM, data, ftyp, moov })
-        } else if (msg.type === MessageType.ELEMENTARY) {
+          // Set up a list of tracks that contain info about
+          // the type of media, encoding, and codec are present.
+          const tracks = msg.sdp.media.map((media) => {
+            return {
+              type: media.type,
+              encoding: media.rtpmap && media.rtpmap.encodingName,
+              mime: media.mime,
+              codec: media.codec,
+            }
+          })
+
+          this.push({ type: MessageType.ISOM, data, tracks, ftyp, moov })
+        } else if (
+          msg.type === MessageType.ELEMENTARY ||
+          msg.type === MessageType.H264
+        ) {
           /**
            * Otherwise we are getting some elementary stream data.
            * Set up the moof and mdat boxes.
@@ -61,6 +75,20 @@ export class Mp4Muxer extends Tube {
               }
             }
 
+            let checkpointTime: number | undefined = undefined
+            const idrPicture =
+              msg.type === MessageType.H264
+                ? msg.nalType === NAL_TYPES.IDR_PICTURE
+                : undefined
+            if (
+              boxBuilder.ntpPresentationTime &&
+              idrPicture &&
+              msg.ntpTimestamp !== undefined
+            ) {
+              checkpointTime =
+                (msg.ntpTimestamp - boxBuilder.ntpPresentationTime) / 1000
+            }
+
             const byteLength = msg.data.byteLength
             const moof = boxBuilder.moof({ trackId, timestamp, byteLength })
             const mdat = boxBuilder.mdat(msg.data)
@@ -75,6 +103,7 @@ export class Mp4Muxer extends Tube {
               moof,
               mdat,
               ntpTimestamp,
+              checkpointTime,
             })
           }
         } else {
@@ -92,14 +121,14 @@ export class Mp4Muxer extends Tube {
   get bitrate() {
     return (
       this.boxBuilder.trackData &&
-      this.boxBuilder.trackData.map(data => data.bitrate)
+      this.boxBuilder.trackData.map((data) => data.bitrate)
     )
   }
 
   get framerate() {
     return (
       this.boxBuilder.trackData &&
-      this.boxBuilder.trackData.map(data => data.framerate)
+      this.boxBuilder.trackData.map((data) => data.framerate)
     )
   }
 

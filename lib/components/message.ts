@@ -1,3 +1,4 @@
+import { MediaTrack } from '../utils/protocols/isom'
 import { Sdp } from '../utils/protocols/sdp'
 
 export interface GenericMessage {
@@ -14,6 +15,7 @@ export enum MessageType {
   RTSP,
   SDP,
   ELEMENTARY,
+  H264,
   ISOM,
   XML,
   JPEG,
@@ -52,8 +54,17 @@ export interface ElementaryMessage extends GenericMessage {
   readonly timestamp: number
 }
 
+export interface H264Message extends GenericMessage {
+  readonly type: MessageType.H264
+  readonly payloadType: number
+  readonly timestamp: number
+  readonly nalType: number
+}
+
 export interface IsomMessage extends GenericMessage {
   readonly type: MessageType.ISOM
+  readonly checkpointTime?: number // presentation time of last I-frame (s)
+  readonly tracks?: MediaTrack[]
 }
 
 export interface XmlMessage extends GenericMessage {
@@ -79,8 +90,9 @@ export type Message =
   | RtspMessage
   | SdpMessage
   | ElementaryMessage
+  | H264Message
   | IsomMessage
   | XmlMessage
   | JpegMessage
 
-export type MessageHandler = (msg: GenericMessage) => void
+export type MessageHandler = (msg: Message) => void

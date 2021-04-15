@@ -15,17 +15,15 @@ export class JPEGDepay extends Tube {
 
     const incoming = new Transform({
       objectMode: true,
-      transform: function(msg: Message, encoding, callback) {
+      transform: function (msg: Message, encoding, callback) {
         if (msg.type === MessageType.SDP) {
-          const jpegMedia = msg.sdp.media.find(
-            (media): media is VideoMedia => {
-              return (
-                media.type === 'video' &&
-                media.rtpmap !== undefined &&
-                media.rtpmap.encodingName === 'JPEG'
-              )
-            },
-          )
+          const jpegMedia = msg.sdp.media.find((media): media is VideoMedia => {
+            return (
+              media.type === 'video' &&
+              media.rtpmap !== undefined &&
+              media.rtpmap.encodingName === 'JPEG'
+            )
+          })
           if (jpegMedia !== undefined && jpegMedia.rtpmap !== undefined) {
             jpegPayloadType = Number(jpegMedia.rtpmap.payloadType)
             const framesize = jpegMedia.framesize

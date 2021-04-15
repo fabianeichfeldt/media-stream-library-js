@@ -1,3 +1,26 @@
+import { MessageType, SdpMessage } from '../../components/message'
+import { NtpSeconds, seconds } from './ntp'
+
+interface ConnectionField {
+  // c=<nettype> <addrtype> <connection-address>
+  networkType: 'IN'
+  addressType: 'IP4' | 'IP6'
+  connectionAddress: string
+}
+
+interface BandwidthField {
+  readonly type: string
+  readonly value: number
+}
+
+// RTSP extensions: https://tools.ietf.org/html/rfc7826 (22.15)
+// exists on both session and media level
+interface RtspExtensions {
+  readonly range?: string
+  readonly control?: string
+  readonly mtag?: string
+}
+
 /**
  * The session description protocol (SDP).
  *
@@ -32,7 +55,7 @@
  * Names of the fields below are annotated above with
  * the names used in Appendix A: SDP Grammar of RFC 2327.
  */
-export interface SessionDescription {
+export interface SessionDescription extends RtspExtensions {
   // v=0
   readonly version: 0
   // o=<username> <sess-id> <sess-version> <nettype> <addrtype> <unicast-address>
@@ -54,10 +77,6 @@ export interface SessionDescription {
   // One or more time descriptions
   readonly time: TimeDescription
   readonly repeatTimes?: RepeatTimeDescription
-  // RTSP attributes
-  readonly range?: string
-  readonly control?: string
-  readonly mtag?: string
   // Zero or more media descriptions
   readonly media: MediaDescription[]
 }
@@ -70,26 +89,6 @@ interface OriginField {
   networkType: 'IN'
   addressType: 'IP4' | 'IP6'
   address: string
-}
-
-interface ConnectionField {
-  // c=<nettype> <addrtype> <connection-address>
-  networkType: 'IN'
-  addressType: 'IP4' | 'IP6'
-  connectionAddress: string
-}
-
-interface BandwidthField {
-  readonly type: string
-  readonly value: number
-}
-
-// RTSP extensions: https://tools.ietf.org/html/rfc7826 (22.15)
-// exists on both session and media level
-interface RtspExtensions {
-  readonly range?: string
-  readonly control?: string
-  readonly mtag?: string
 }
 
 /**
@@ -126,7 +125,7 @@ export interface RepeatTimeDescription {
  * can be multiple fmt values with corresponding rtpmap
  * attributes)
  */
-export interface MediaDescription {
+export interface MediaDescription extends RtspExtensions {
   // m=<media> <port> <proto> <fmt> ...
   // m=<media> <port>/<number of ports> <proto> <fmt> ...
   readonly type: 'audio' | 'video' | 'application' | 'data' | 'control'
@@ -139,10 +138,6 @@ export interface MediaDescription {
    * Any remaining attributes
    * a=...
    */
-  // RTSP attributes
-  readonly range?: string
-  readonly control?: string
-  readonly mtag?: string
   // a=rtpmap:<payload type> <encoding name>/<clock rate> [/<encoding parameters>]
   readonly rtpmap?: {
     readonly clockrate: number
@@ -210,15 +205,15 @@ export interface AACMedia extends AudioMedia {
 }
 
 export interface Sdp {
-  readonly session: Session
-  readonly media: ReadonlyArray<MediaDescription>
+  readonly session: SessionDescription
+  readonly media: MediaDescription[]
 }
 
 const extractLineVals = (buffer: Buffer, lineStart: string, start = 0) => {
   const anchor = `\n${lineStart}`
   start = buffer.indexOf(anchor, start)
   let end = 0
-  const ret = []
+  const ret: string[] = []
   while (start >= 0) {
     end = buffer.indexOf('\n', start + anchor.length)
     ret.push(buffer.toString('ascii', start + anchor.length, end).trim())
@@ -254,7 +249,7 @@ const attributeParsers: any = {
       default:
         const pairs = stringParameters.trim().split(';')
         const parameters: { [key: string]: any } = {}
-        pairs.forEach(pair => {
+        pairs.forEach((pair) => {
           const [key, val] = splitOnFirst('=', pair)
           const normalizedKey = key.trim().toLowerCase()
           if (normalizedKey !== '') {
@@ -288,13 +283,10 @@ const attributeParsers: any = {
     }
   },
   transform: (value: string) => {
-    return value.split(';').map(row => row.split(',').map(Number))
+    return value.split(';').map((row) => row.split(',').map(Number))
   },
   framesize: (value: string) => {
-    return value
-      .split(' ')[1]
-      .split('-')
-      .map(Number)
+    return value.split(' ')[1].split('-').map(Number)
   },
 }
 
@@ -411,7 +403,7 @@ export const parse = (buffer: Buffer): Sdp => {
   const sdp = buffer
     .toString('ascii')
     .split('\n')
-    .map(s => s.trim())
+    .map((s) => s.trim())
   const struct: { [key: string]: any } = { session: {}, media: [] }
   let mediaCounter = 0
   let current = struct.session
@@ -425,10 +417,6 @@ export const parse = (buffer: Buffer): Sdp => {
   }
   return struct as Sdp
 }
-
-import { Session } from 'inspector'
-import { MessageType, SdpMessage } from '../../components/message'
-import { NtpSeconds, seconds } from './ntp'
 
 export const messageFromBuffer = (buffer: Buffer): SdpMessage => {
   return {

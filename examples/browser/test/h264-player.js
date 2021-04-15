@@ -1,22 +1,22 @@
 const { pipelines, components } = window.mediaStreamLibrary
 
-const play = host => {
+const play = (host) => {
 
   const grid = document.querySelector(".grid")
-  for(let i=0; i < 25; i++) {
+  for (let i = 0; i < 25; i++) {
     const div = document.createElement("div")
     div.setAttribute("class", "container")
     const video = document.createElement("video")
     video.setAttribute("class", "player")
     div.append(video)
-    video.muted=true;
+    video.muted = true;
     video.autoplay = true;
     grid.append(div)
   }
 
   const mediaElements = document.querySelectorAll('video')
   const sinks = []
-  for(let mediaElement of mediaElements)
+  for (let mediaElement of mediaElements)
     sinks.push(new components.MseSink(mediaElement));
 
   const initialPipeline = new pipelines.Html5VideoMultiplexPipeline({

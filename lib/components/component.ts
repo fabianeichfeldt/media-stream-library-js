@@ -1,6 +1,6 @@
 import { Duplex, PassThrough, Readable, Stream, Writable } from 'stream'
 import StreamFactory from './helpers/stream-factory'
-import { Message, MessageHandler, GenericMessage } from './message'
+import { MessageHandler, GenericMessage } from './message'
 
 export type Component = Source | Tube | Sink
 
@@ -94,6 +94,14 @@ export class Source extends AbstractComponent {
       throw new Error('connection failed: component(s) already connected')
     }
 
+    if (!this.incoming.readable || !this.outgoing.writable) {
+      throw new Error('connection failed: this component not compatible')
+    }
+
+    if (!next.incoming.writable || !next.outgoing.readable) {
+      throw new Error('connection failed: next component not compatible')
+    }
+
     try {
       this.incoming.pipe(next.incoming)
       next.outgoing.pipe(this.outgoing)
@@ -106,12 +114,12 @@ export class Source extends AbstractComponent {
      * to all previous streams (but not further than any endpoints). What happens
      * when an error is emitted on a stream is up to the stream's implementation.
      */
-    const incomingErrorHandler: ErrorEventHandler = err => {
+    const incomingErrorHandler: ErrorEventHandler = (err) => {
       this.incoming.emit('error', err)
     }
     next.incoming.on('error', incomingErrorHandler)
 
-    const outgoingErrorHandler: ErrorEventHandler = err => {
+    const outgoingErrorHandler: ErrorEventHandler = (err) => {
       next.outgoing.emit('error', err)
     }
     this.outgoing.on('error', outgoingErrorHandler)
@@ -157,8 +165,8 @@ export class Source extends AbstractComponent {
 
 export class Tube extends Source {
   public static fromHandlers(
-    fnIncoming: MessageHandler,
-    fnOutgoing: MessageHandler,
+    fnIncoming: MessageHandler | undefined,
+    fnOutgoing: MessageHandler | undefined,
   ) {
     const incomingStream = fnIncoming
       ? StreamFactory.peeker(fnIncoming)
