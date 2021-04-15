@@ -1,0 +1,53 @@
+version: "3.7"
+
+services:
+  rtsp-source:
+    image: steabert/gst-rtsp-launch
+    container_name: rtsp
+    command: ["videotestsrc ! video/x-raw,width=1024,height=768 ! timeoverlay text='H.264' valignment=top halignment=left ! x264enc ! rtph264pay name=pay0 pt=96"]
+    expose:
+      - 8554
+    ports:
+      - 8554:8554
+
+  http-backend:
+    image: nginx:latest
+    container_name: http-backend
+    volumes:
+      - ./examples/browser:/usr/share/nginx/html
+    ports:
+      - 8080:80
+
+  node-backend:
+    image: my-node-backend
+    container_name: node-backend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - 8854:8854
+
+  grafana:
+    image: grafana/grafana:5.1.0
+    container_name: grafana
+    ports:
+      - 3000:3000
+
+  influx:
+    image: influxdb:1.8-alpine
+    container_name: influx
+    environment:
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+    volumes:
+      - influxdb:/var/lib/influxdb
+      - ./influxdb/scripts:/docker-entrypoint-initdb.d
+      - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    command: influxd -config /etc/influxdb/influxdb.conf
+    ports:
+      - 8086:8086
+
+volumes:
+  influxdb:
+
+

@@ -21,7 +21,7 @@ const play = (host) => {
 
   const initialPipeline = new pipelines.Html5VideoMultiplexPipeline({
     ws: { uri: `ws://${host}:${8854}/` },
-    rtsp: { uri: `rtsp://localhost:${8554}/test` },
+    rtsp: { uri: `rtsp://rtsp-source:${8554}/test` },
     sinks: sinks
   })
   initialPipeline.ready.then(() => {
