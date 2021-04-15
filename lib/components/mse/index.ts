@@ -3,7 +3,7 @@ import { Writable, Readable } from 'stream'
 import { MessageType, Message } from '../message'
 import { packetType, BYE } from '../../utils/protocols/rtcp'
 
-const TRIGGER_THRESHOLD = 100
+const TRIGGER_THRESHOLD = 5
 
 export interface MediaTrack {
   type: string
