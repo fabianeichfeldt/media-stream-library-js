@@ -11,10 +11,11 @@ services:
       - 8554:8554
 
   http-backend:
-    image: nginx:latest
+    image: fabian986/msl-http-backend
     container_name: http-backend
-    volumes:
-      - ./examples/browser:/usr/share/nginx/html
+    build:
+      context: .
+      dockerfile: ./Dockerfile_http
     ports:
       - 8080:80
 
@@ -23,7 +24,7 @@ services:
     container_name: node-backend
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile_node
     ports:
       - 8854:8854
 
@@ -31,10 +32,10 @@ services:
     image: grafana/grafana:5.1.0
     container_name: grafana
     ports:
-      - 3000:3000
+      - 3001:3000
 
   influx:
-    image: influxdb:1.8-alpine
+    image: influxdb:1.8
     container_name: influx
     environment:
       - INFLUXDB_ADMIN_USER=admin
