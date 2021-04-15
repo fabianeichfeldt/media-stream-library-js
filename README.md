@@ -18,7 +18,15 @@ which is supported in all modern browsers.
 This is a special branch for investigating and provoking memory leaks, like described here:
 https://bugs.chromium.org/p/chromium/issues/detail?id=1174675&q=&can=5
 
-### Installation and build
+### Run with docker-compose
+```
+docker-compose up -d
+```
+goto http://localhost:8080/test/h264.html
+
+### OR:
+### Installation and build bare metal
+- install docker on your machine
 - install yarn as global tool:
 ```
 npm i -g yarn
