@@ -19,7 +19,7 @@ services:
       - 8080:80
 
   node-backend:
-    image: my-node-backend
+    image: fabian986/msl-node-backend
     container_name: node-backend
     build:
       context: .
