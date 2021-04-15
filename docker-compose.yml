@@ -28,25 +28,25 @@ services:
     ports:
       - 8854:8854
 
-  grafana:
-    image: grafana/grafana:5.1.0
-    container_name: grafana
-    ports:
-      - 3001:3000
-
-  influx:
-    image: influxdb:1.8
-    container_name: influx
-    environment:
-      - INFLUXDB_ADMIN_USER=admin
-      - INFLUXDB_ADMIN_PASSWORD=admin
-    volumes:
-      - influxdb:/var/lib/influxdb
-      - ./influxdb/scripts:/docker-entrypoint-initdb.d
-      - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
-    command: influxd -config /etc/influxdb/influxdb.conf
-    ports:
-      - 8086:8086
+#  grafana:
+#    image: grafana/grafana:5.1.0
+#    container_name: grafana
+#    ports:
+#      - 3001:3000
+#
+#  influx:
+#    image: influxdb:1.8
+#    container_name: influx
+#    environment:
+#      - INFLUXDB_ADMIN_USER=admin
+#      - INFLUXDB_ADMIN_PASSWORD=admin
+#    volumes:
+#      - influxdb:/var/lib/influxdb
+#      - ./influxdb/scripts:/docker-entrypoint-initdb.d
+#      - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+#    command: influxd -config /etc/influxdb/influxdb.conf
+#    ports:
+#      - 8086:8086
 
 volumes:
   influxdb:
